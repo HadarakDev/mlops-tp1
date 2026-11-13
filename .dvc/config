@@ -1,0 +1,4 @@
+[core]
+    remote = store
+['remote "store"']
+    url = ~/dvc-store
