@@ -1,4 +1,8 @@
-"""Predict whether one wine is good, from a JSON sample."""
+"""Predict whether one wine is good, from a JSON sample.
+
+The model comes from the MLflow registry, by alias: no path, no version number.
+Moving the @champion alias changes what this script serves, with no code change.
+"""
 
 # Importing pandas and scikit-learn takes a few seconds: say so before
 # it happens, otherwise the terminal looks frozen.
@@ -6,12 +10,14 @@ print("loading libraries...", flush=True)
 
 import argparse
 import json
+import os
 from pathlib import Path
 
-import joblib
+import mlflow
+import mlflow.sklearn
 import pandas as pd
 
-MODEL = Path("models/model.pkl")
+MODEL_URI = "models:/wine-quality@champion"
 
 # The model was trained on these columns, in this order.
 FEATURES = [
@@ -36,7 +42,8 @@ def parse_args():
 
 
 def load_model():
-    return joblib.load(MODEL)
+    mlflow.set_tracking_uri(os.environ.get("MLFLOW_TRACKING_URI", "sqlite:///mlflow.db"))
+    return mlflow.sklearn.load_model(MODEL_URI)
 
 
 def main():
@@ -49,6 +56,7 @@ def main():
     proba = float(model.predict_proba(X)[0][1])
 
     print(f"sample     : {args.sample}")
+    print(f"model      : {MODEL_URI}")
     print(f"good wine  : {bool(prediction)}")
     print(f"p(good)    : {proba:.3f}")
 
