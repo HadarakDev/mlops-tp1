@@ -1,6 +1,7 @@
 """Train a RandomForest on the red wine quality dataset.
 
 Task: binary classification, "good wine" = quality >= 6. Metric: F1.
+Every run is logged to MLflow (set MLFLOW_TRACKING_URI first).
 """
 
 # Importing pandas and scikit-learn takes a few seconds: say so before
@@ -12,6 +13,8 @@ import sys
 from pathlib import Path
 
 import joblib
+import mlflow
+import mlflow.sklearn
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import f1_score
@@ -60,8 +63,19 @@ def main():
         max_depth=args.max_depth,
         random_state=RANDOM_STATE,
     )
-    model.fit(X_train, y_train)
-    f1 = f1_score(y_test, model.predict(X_test))
+
+    mlflow.set_experiment("wine-quality")
+
+    with mlflow.start_run():
+        mlflow.log_params({"n_estimators": args.n_estimators,
+                           "max_depth": args.max_depth})
+        model.fit(X_train, y_train)
+        f1 = f1_score(y_test, model.predict(X_test))
+        mlflow.log_metric("f1", f1)
+        # MLflow 3.17 serialises sklearn models with skops by default, and skops
+        # refuses tree-based models unless their node type is declared trusted.
+        mlflow.sklearn.log_model(model, name="model",
+                                 skops_trusted_types=["sklearn.tree._tree.Tree"])
 
     print(f"f1 = {f1:.4f}")
 
