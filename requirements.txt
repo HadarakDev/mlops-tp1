@@ -1,0 +1,15 @@
+# Python 3.12 or newer (numpy 2.5 and scikit-learn 1.9 require it).
+# Pinned on purpose: everyone must get the same md5 on the dataset and the
+# same F1 on the model.
+dvc==3.67.1
+mlflow==3.17.1
+scikit-learn==1.9.1
+pandas==3.0.6
+numpy==2.5.4
+joblib==1.6.0
+PyYAML==6.0.3
+
+# Conda environments ship OpenSSL 3.0, which cryptography 49+ no longer supports
+# (ImportError: symbol not found ... _OSSL_get_max_threads). 48.0.1 also satisfies
+# asyncssh, a DVC dependency that requires >= 48.0.1.
+cryptography==48.0.1

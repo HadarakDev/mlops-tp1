@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+
+# MLflow local state: rebuilt by tools/seed_mlflow.py, never committed.
+mlflow.db
+mlruns/
+mlartifacts/
+
+# Models are artefacts, not sources.
+models/
+
+.DS_Store
